@@ -21,9 +21,8 @@ class DonNhapHangController extends Controller
     public function create()
     {
         $nccs = NCC::all();
-        $loaiHangs = LoaiHang::all();
-        $matHangs = MatHang::with('loaiHang')->get();
-        return view('don-nhap.create', compact('nccs', 'loaiHangs', 'matHangs'));
+        $matHangs = MatHang::all();
+        return view('don-nhap.create', compact('nccs', 'matHangs'));
     }
 
     public function store(Request $request)
@@ -31,8 +30,18 @@ class DonNhapHangController extends Controller
         $request->validate([
             'FK_Id_NCC' => 'required|exists:NCC,Id_NCC',
             'items' => 'required|array|min:1',
-            'items.*.FK_Id_MatHang' => 'required|exists:MatHang,Id_MatHang',
+            'items.*.FK_Id_MatHang' => 'required|exists:MatHang,Id_MatHang|distinct',
             'items.*.Count' => 'required|integer|min:1',
+        ], [
+            'FK_Id_NCC.required' => 'Vui lòng chọn Nhà cung cấp.',
+            'FK_Id_NCC.exists' => 'Nhà cung cấp không hợp lệ.',
+            'items.required' => 'Đơn hàng phải có ít nhất một mặt hàng.',
+            'items.min' => 'Đơn hàng phải có ít nhất một mặt hàng.',
+            'items.*.FK_Id_MatHang.required' => 'Vui lòng chọn mặt hàng.',
+            'items.*.FK_Id_MatHang.exists' => 'Mặt hàng không tồn tại.',
+            'items.*.FK_Id_MatHang.distinct' => 'Mặt hàng trong đơn không được trùng nhau.',
+            'items.*.Count.required' => 'Vui lòng nhập số lượng.',
+            'items.*.Count.min' => 'Số lượng phải lớn hơn 0.',
         ]);
 
         try {

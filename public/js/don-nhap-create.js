@@ -1,53 +1,76 @@
 document.addEventListener('DOMContentLoaded', function () {
-    let itemCount = 1;
     const container = document.getElementById('items-container');
     const addButton = document.getElementById('add-item');
-    const loaiHangFilter = document.getElementById('loai-hang-filter');
 
-    // Lọc mặt hàng theo loại hàng
-    loaiHangFilter.addEventListener('change', function () {
-        const selectedLoai = this.value;
-        document.querySelectorAll('.mat-hang-select').forEach(select => {
-            const currentValue = select.value;
-            select.querySelectorAll('option').forEach(option => {
-                if (!option.value) return;
-                // Giữ nguyên option đã được chọn
-                if (option.value === currentValue) {
-                    option.style.display = '';
-                    return;
-                }
-                if (!selectedLoai || option.dataset.loai === selectedLoai) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
-                }
-            });
+    // Cập nhật trạng thái của tất cả các nút xóa
+    function updateDeleteButtons() {
+        const rows = container.querySelectorAll('.item-row');
+        rows.forEach(row => {
+            const deleteBtn = row.querySelector('.remove-item');
+            if (rows.length > 1) {
+                deleteBtn.disabled = false;
+            } else {
+                deleteBtn.disabled = true;
+            }
         });
-    });
+    }
+
+    // Đánh lại số thứ tự (index) cho các input để gởi về server đúng mảng
+    function updateIndices() {
+        const rows = container.querySelectorAll('.item-row');
+        rows.forEach((row, index) => {
+            const select = row.querySelector('.mat-hang-select');
+            const input = row.querySelector('input[type="number"]');
+            if (select) select.name = `items[${index}][FK_Id_MatHang]`;
+            if (input) input.name = `items[${index}][Count]`;
+        });
+        updateDeleteButtons();
+    }
 
     // Thêm dòng mặt hàng mới
-    addButton.addEventListener('click', () => {
-        const firstRow = document.querySelector('.item-row');
+    addButton.addEventListener('click', function () {
+        const rows = container.querySelectorAll('.item-row');
+        const firstRow = rows[0];
         const newRow = firstRow.cloneNode(true);
 
-        const select = newRow.querySelector('select');
-        const input = newRow.querySelector('input');
-        const removeBtn = newRow.querySelector('.remove-item');
+        // Reset các giá trị của dòng mới chọn
+        const select = newRow.querySelector('.mat-hang-select');
+        const input = newRow.querySelector('input[type="number"]');
 
-        select.name = `items[${itemCount}][FK_Id_MatHang]`;
-        select.value = "";
-        input.name = `items[${itemCount}][Count]`;
-        input.value = "";
-        removeBtn.disabled = false;
+        if (select) {
+            select.value = "";
+            // Xóa validation cũ nếu có
+            select.classList.remove('is-invalid');
+            const error = select.parentElement.querySelector('.invalid-feedback');
+            if (error) error.remove();
+        }
 
-        removeBtn.addEventListener('click', function () {
-            newRow.remove();
-        });
+        if (input) {
+            input.value = "";
+            input.classList.remove('is-invalid');
+            const error = input.parentElement.querySelector('.invalid-feedback');
+            if (error) error.remove();
+        }
 
         container.appendChild(newRow);
-        itemCount++;
 
-        // Áp dụng bộ lọc cho dòng mới
-        loaiHangFilter.dispatchEvent(new Event('change'));
+        // Cập nhật lại logic
+        updateIndices();
     });
+
+    // Xóa dòng mặt hàng (sử dụng Event Delegation trên container)
+    container.addEventListener('click', function (e) {
+        const deleteBtn = e.target.closest('.remove-item');
+        if (deleteBtn) {
+            const rows = container.querySelectorAll('.item-row');
+            if (rows.length > 1) {
+                const row = deleteBtn.closest('.item-row');
+                row.remove();
+                updateIndices();
+            }
+        }
+    });
+
+    // Chạy khởi tạo lần đầu khi load trang
+    updateIndices();
 });
