@@ -5,10 +5,15 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="h4 mb-1 fw-bold">Danh sách Đơn nhập hàng</h2>
-        <p class="text-muted mb-0">Quản lý các đợt nhập hàng từ nhà cung cấp</p>
+        <h2 class="h4 mb-1 fw-bold">
+            Danh sách Đơn nhập hàng
+        </h2>
+        <p class="text-muted mb-0 d-flex align-items-center">
+            Quản lý các đợt nhập hàng từ nhà cung cấp
+            <span class="ms-2 badge bg-light text-primary border rounded-pill fs-6">Tổng: {{ $dsDonNhap->total() }} đơn</span>
+        </p>
     </div>
-    <a href="{{ route('don-nhap.create') }}" class="btn btn-primary d-flex align-items-center">
+    <a href="{{ route('don-nhap.create') }}" class="btn btn-primary d-flex align-items-center shadow-sm">
         <i class="bi bi-plus-lg me-2"></i> Tạo Đơn mới
     </a>
 </div>

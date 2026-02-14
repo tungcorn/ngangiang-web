@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LoaiHang;
 use Illuminate\Http\Request;
 use App\Models\DonNhapHang;
 use App\Models\ChiTietDonNhap;
@@ -20,8 +21,8 @@ class DonNhapHangController extends Controller
     public function create()
     {
         $dsNCC = NCC::all();
-        $dsMatHang = MatHang::all();
-        return view('don-nhap.create', compact('dsNCC', 'dsMatHang'));
+        $dsLoaiHang = LoaiHang::with('matHangs')->get();
+        return view('don-nhap.create', compact('dsNCC', 'dsLoaiHang'));
     }
 
     public function store(Request $request)

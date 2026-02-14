@@ -42,10 +42,14 @@
                                                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                                                 <select name="items[{{ $index }}][FK_Id_MatHang]" class="form-select mat-hang-select @error('items.'.$index.'.FK_Id_MatHang') is-invalid @enderror">
                                                     <option value="">-- Chọn mặt hàng --</option>
-                                                    @foreach($dsMatHang as $mh)
-                                                    <option value="{{ $mh->Id_MatHang }}" {{ $item['FK_Id_MatHang'] == $mh->Id_MatHang ? 'selected' : '' }}>
-                                                        {{ $mh->Ten_MatHang }} — ({{ number_format($mh->DonGia) }} ₫)
-                                                    </option>
+                                                    @foreach($dsLoaiHang as $loai)
+                                                        <optgroup label="{{ $loai->Name }}">
+                                                            @foreach($loai->matHangs as $mh)
+                                                            <option value="{{ $mh->Id_MatHang }}" {{ $item['FK_Id_MatHang'] == $mh->Id_MatHang ? 'selected' : '' }}>
+                                                                {{ $mh->Ten_MatHang }} — ({{ number_format($mh->DonGia) }} ₫)
+                                                            </option>
+                                                            @endforeach
+                                                        </optgroup>
                                                     @endforeach
                                                 </select>
                                                 @error('items.'.$index.'.FK_Id_MatHang') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -73,10 +77,14 @@
                                                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                                                 <select name="items[0][FK_Id_MatHang]" class="form-select mat-hang-select">
                                                     <option value="">-- Chọn mặt hàng --</option>
-                                                    @foreach($dsMatHang as $mh)
-                                                    <option value="{{ $mh->Id_MatHang }}">
-                                                        {{ $mh->Ten_MatHang }} — ({{ number_format($mh->DonGia) }} ₫)
-                                                    </option>
+                                                    @foreach($dsLoaiHang as $loai)
+                                                        <optgroup label="{{ $loai->Name }}">
+                                                            @foreach($loai->matHangs as $mh)
+                                                            <option value="{{ $mh->Id_MatHang }}">
+                                                                {{ $mh->Ten_MatHang }} — ({{ number_format($mh->DonGia) }} ₫)
+                                                            </option>
+                                                            @endforeach
+                                                        </optgroup>
                                                     @endforeach
                                                 </select>
                                             </div>
