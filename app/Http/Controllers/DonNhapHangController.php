@@ -30,7 +30,7 @@ class DonNhapHangController extends Controller
         $request->validate([
             'FK_Id_NCC' => 'required|exists:NCC,Id_NCC',
             'items' => 'required|array|min:1',
-            'items.*.FK_Id_MatHang' => 'required|exists:MatHang,Id_MatHang|distinct',
+            'items.*.FK_Id_MatHang' => 'required|exists:MatHang,Id_MatHang',
             'items.*.Count' => 'required|integer|min:1',
         ], [
             'FK_Id_NCC.required' => 'Vui lòng chọn Nhà cung cấp.',
@@ -39,7 +39,6 @@ class DonNhapHangController extends Controller
             'items.min' => 'Đơn hàng phải có ít nhất một mặt hàng.',
             'items.*.FK_Id_MatHang.required' => 'Vui lòng chọn mặt hàng.',
             'items.*.FK_Id_MatHang.exists' => 'Mặt hàng không tồn tại.',
-            'items.*.FK_Id_MatHang.distinct' => 'Mặt hàng trong đơn không được trùng nhau.',
             'items.*.Count.required' => 'Vui lòng nhập số lượng.',
             'items.*.Count.min' => 'Số lượng phải lớn hơn 0.',
         ]);
