@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\DonNhapHang;
+use App\Models\MatHang;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,15 +11,12 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ChiTietDonNhapFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'FK_Id_DonNhapHang' => DonNhapHang::factory(),
+            'FK_Id_MatHang' => MatHang::factory(),
+            'Count' => fake()->numberBetween(1, 50),
         ];
     }
 }

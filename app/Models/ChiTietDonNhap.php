@@ -13,6 +13,7 @@ class ChiTietDonNhap extends Model
     public $incrementing = false;
     protected $primaryKey = null;
     protected $fillable = ['FK_Id_DonNhapHang', 'FK_Id_MatHang', 'Count'];
+    public $timestamps = false;
 
     public function donNhapHang()
     {

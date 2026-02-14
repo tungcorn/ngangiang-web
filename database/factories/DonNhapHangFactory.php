@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\NCC;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,15 +10,11 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class DonNhapHangFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'FK_Id_NCC' => NCC::factory(),
+            'NgayNhap' => fake()->dateTimeBetween('-3 months', 'now'),
         ];
     }
 }
