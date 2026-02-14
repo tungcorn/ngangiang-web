@@ -13,7 +13,7 @@
     </a>
 </div>
 
-@forelse($donNhaps as $don)
+@forelse($dsDonNhap as $don)
 <div class="card mb-4">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
@@ -101,4 +101,9 @@
     </a>
 </div>
 @endforelse
+
+<div class="mt-4 d-flex justify-content-center small">
+    {{ $dsDonNhap->links() }}
+</div>
+
 @endsection

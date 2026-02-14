@@ -24,7 +24,7 @@
                         </label>
                         <select name="FK_Id_NCC" class="form-select form-select-lg @error('FK_Id_NCC') is-invalid @enderror">
                             <option value="">-- Chọn Nhà Cung Cấp --</option>
-                            @foreach($nccs as $ncc)
+                            @foreach($dsNCC as $ncc)
                             <option value="{{ $ncc->Id_NCC }}" {{ old('FK_Id_NCC') == $ncc->Id_NCC ? 'selected' : '' }}>{{ $ncc->Ten_NCC }}</option>
                             @endforeach
                         </select>
@@ -42,7 +42,7 @@
                                                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                                                 <select name="items[{{ $index }}][FK_Id_MatHang]" class="form-select mat-hang-select @error('items.'.$index.'.FK_Id_MatHang') is-invalid @enderror">
                                                     <option value="">-- Chọn mặt hàng --</option>
-                                                    @foreach($matHangs as $mh)
+                                                    @foreach($dsMatHang as $mh)
                                                     <option value="{{ $mh->Id_MatHang }}" {{ $item['FK_Id_MatHang'] == $mh->Id_MatHang ? 'selected' : '' }}>
                                                         {{ $mh->Ten_MatHang }} — ({{ number_format($mh->DonGia) }} ₫)
                                                     </option>
@@ -73,7 +73,7 @@
                                                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                                                 <select name="items[0][FK_Id_MatHang]" class="form-select mat-hang-select">
                                                     <option value="">-- Chọn mặt hàng --</option>
-                                                    @foreach($matHangs as $mh)
+                                                    @foreach($dsMatHang as $mh)
                                                     <option value="{{ $mh->Id_MatHang }}">
                                                         {{ $mh->Ten_MatHang }} — ({{ number_format($mh->DonGia) }} ₫)
                                                     </option>

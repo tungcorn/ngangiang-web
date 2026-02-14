@@ -13,15 +13,15 @@ class DonNhapHangController extends Controller
 {
     public function index()
     {
-        $donNhaps = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc')->get();
-        return view('don-nhap.index', compact('donNhaps'));
+        $dsDonNhap = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc')->paginate(5);
+        return view('don-nhap.index', compact('dsDonNhap'));
     }
 
     public function create()
     {
-        $nccs = NCC::all();
-        $matHangs = MatHang::all();
-        return view('don-nhap.create', compact('nccs', 'matHangs'));
+        $dsNCC = NCC::all();
+        $dsMatHang = MatHang::all();
+        return view('don-nhap.create', compact('dsNCC', 'dsMatHang'));
     }
 
     public function store(Request $request)
