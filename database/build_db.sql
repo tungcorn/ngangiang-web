@@ -45,7 +45,6 @@ CREATE TABLE MatHang (
 -- ============================================
 CREATE TABLE DonNhapHang (
     Id_DonNhapHang INT PRIMARY KEY IDENTITY(1,1),
-    NgayNhap DATETIME DEFAULT GETDATE(),
     FK_Id_NCC INT NOT NULL,
     CONSTRAINT FK_DonNhap_NCC FOREIGN KEY (FK_Id_NCC) REFERENCES NCC(Id_NCC)
 );

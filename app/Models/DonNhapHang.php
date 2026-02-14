@@ -11,7 +11,7 @@ class DonNhapHang extends Model
 
     protected $table = 'DonNhapHang';
     protected $primaryKey = 'Id_DonNhapHang';
-    protected $fillable = ['FK_Id_NCC', 'NgayNhap'];
+    protected $fillable = ['FK_Id_NCC'];
     public $timestamps = false;
 
     public function ncc()

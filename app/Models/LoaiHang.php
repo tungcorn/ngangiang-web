@@ -12,6 +12,7 @@ class LoaiHang extends Model
     protected $table = 'LoaiHang';
     protected $primaryKey = 'Id_LoaiHang';
     protected $fillable = ['Name'];
+    public $timestamps = false;
 
     public function matHangs()
     {

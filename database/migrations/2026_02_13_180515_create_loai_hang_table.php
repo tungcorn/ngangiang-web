@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('LoaiHang', function (Blueprint $table) {
             $table->id('Id_LoaiHang');
             $table->string('Name');
-            $table->timestamps();
         });
     }
 

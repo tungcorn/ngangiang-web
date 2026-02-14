@@ -22,9 +22,6 @@
             </div>
             <div>
                 <span class="d-block fw-bold">Đơn nhập #{{ $don->Id_DonNhapHang }}</span>
-                <small class="text-muted">
-                    <i class="bi bi-clock me-1"></i> {{ \Carbon\Carbon::parse($don->NgayNhap)->format('d/m/Y H:i') }}
-                </small>
             </div>
         </div>
     </div>

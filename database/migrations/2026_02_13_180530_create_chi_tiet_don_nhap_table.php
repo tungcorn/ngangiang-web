@@ -18,7 +18,6 @@ return new class extends Migration
             $table->primary(['FK_Id_DonNhapHang', 'FK_Id_MatHang']);
             $table->foreign('FK_Id_DonNhapHang')->references('Id_DonNhapHang')->on('DonNhapHang')->onDelete('cascade');
             $table->foreign('FK_Id_MatHang')->references('Id_MatHang')->on('MatHang')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 

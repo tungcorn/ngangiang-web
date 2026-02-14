@@ -13,6 +13,7 @@ class NCC extends Model
     protected $table = 'NCC';
     protected $primaryKey = 'Id_NCC';
     protected $fillable = ['Ten_NCC', 'DiaChi', 'Email'];
+    public $timestamps = false;
 
     public function donNhapHangs()
     {

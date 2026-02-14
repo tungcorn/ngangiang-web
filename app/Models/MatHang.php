@@ -12,6 +12,7 @@ class MatHang extends Model
     protected $table = 'MatHang';
     protected $primaryKey = 'Id_MatHang';
     protected $fillable = ['Ten_MatHang', 'DonViTinh', 'DonGia', 'FK_Id_LoaiHang'];
+    public $timestamps = false;
 
     public function loaiHang()
     {

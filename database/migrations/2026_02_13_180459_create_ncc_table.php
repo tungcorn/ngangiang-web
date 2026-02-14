@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('Ten_NCC');
             $table->string('DiaChi')->nullable();
             $table->string('Email')->nullable();
-            $table->timestamps();
         });
     }
 

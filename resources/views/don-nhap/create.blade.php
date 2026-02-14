@@ -35,7 +35,7 @@
                             <div id="items-container">
                                 @if(old('items'))
                                     @foreach(old('items') as $index => $item)
-                                    <div class="row g-3 mb-3 item-row align-items-end">
+                                    <div class="row g-3 mb-3 item-row">
                                         <div class="col-md-7">
                                             <label class="form-label small text-muted">Mặt hàng</label>
                                             <div class="input-group">
@@ -57,6 +57,7 @@
                                             @error('items.'.$index.'.Count') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                         <div class="col-md-2">
+                                            <label class="form-label d-block text-white">&nbsp;</label>
                                             <button type="button" class="btn btn-outline-danger w-100 remove-item" {{ $index == 0 ? 'disabled' : '' }}>
                                                 <i class="bi bi-trash"></i> Xóa
                                             </button>
@@ -65,7 +66,7 @@
                                     @endforeach
                                 @else
                                     {{-- Mặc định hiển thị 1 dòng nếu chưa có dữ liệu cũ --}}
-                                    <div class="row g-3 mb-3 item-row align-items-end">
+                                    <div class="row g-3 mb-3 item-row">
                                         <div class="col-md-7">
                                             <label class="form-label small text-muted">Mặt hàng</label>
                                             <div class="input-group">
@@ -85,6 +86,7 @@
                                             <input type="number" name="items[0][Count]" class="form-control" placeholder="0" min="1">
                                         </div>
                                         <div class="col-md-2">
+                                            <label class="form-label d-block text-white">&nbsp;</label>
                                             <button type="button" class="btn btn-outline-danger w-100 remove-item" disabled>
                                                 <i class="bi bi-trash"></i> Xóa
                                             </button>

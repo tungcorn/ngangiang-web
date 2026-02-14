@@ -7,14 +7,13 @@ use App\Models\DonNhapHang;
 use App\Models\ChiTietDonNhap;
 use App\Models\NCC;
 use App\Models\MatHang;
-use App\Models\LoaiHang;
 use Illuminate\Support\Facades\DB;
 
 class DonNhapHangController extends Controller
 {
     public function index()
     {
-        $donNhaps = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('NgayNhap', 'desc')->get();
+        $donNhaps = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc')->get();
         return view('don-nhap.index', compact('donNhaps'));
     }
 
@@ -48,7 +47,6 @@ class DonNhapHangController extends Controller
 
             $donNhap = DonNhapHang::create([
                 'FK_Id_NCC' => $request->FK_Id_NCC,
-                'NgayNhap' => now(),
             ]);
 
             // Gộp các mặt hàng trùng nhau (cộng dồn số lượng)

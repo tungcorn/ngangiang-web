@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id('Id_DonNhapHang');
             $table->unsignedBigInteger('FK_Id_NCC');
             $table->foreign('FK_Id_NCC')->references('Id_NCC')->on('NCC')->onDelete('cascade');
-            $table->timestamp('NgayNhap')->useCurrent();
-            $table->timestamps();
         });
     }
 

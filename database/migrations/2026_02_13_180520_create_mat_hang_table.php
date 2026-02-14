@@ -18,7 +18,6 @@ return new class extends Migration
             $table->decimal('DonGia', 18, 2);
             $table->unsignedBigInteger('FK_Id_LoaiHang');
             $table->foreign('FK_Id_LoaiHang')->references('Id_LoaiHang')->on('LoaiHang')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 
