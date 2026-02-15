@@ -1,3 +1,9 @@
+/**
+ * Script quản lý form tạo đơn nhập hàng mới.
+ *
+ * Xử lý thêm/xóa dòng mặt hàng động và đánh lại index
+ * cho mảng items[] trước khi submit về server.
+ */
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('items-container');
     const addButton = document.getElementById('add-item');
@@ -15,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Đánh lại số thứ tự (index) cho các input để gởi về server đúng mảng
+    // Đánh lại số thứ tự (index) cho các input để gửi về server đúng mảng
     function updateIndices() {
         const rows = container.querySelectorAll('.item-row');
         rows.forEach((row, index) => {
@@ -33,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const firstRow = rows[0];
         const newRow = firstRow.cloneNode(true);
 
-        // Reset các giá trị của dòng mới chọn
+        // Reset các giá trị của dòng mới được clone
         const select = newRow.querySelector('.mat-hang-select');
         const input = newRow.querySelector('input[type="number"]');
 
@@ -54,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         container.appendChild(newRow);
 
-        // Cập nhật lại logic
+        // Cập nhật lại index và trạng thái nút xóa
         updateIndices();
     });
 

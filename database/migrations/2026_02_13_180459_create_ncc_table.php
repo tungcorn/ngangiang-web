@@ -4,11 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Migration tạo bảng NCC (Nhà Cung Cấp).
+ *
+ * Cột: Id_NCC (PK), Ten_NCC, DiaChi (nullable), Email (nullable).
+ * DiaChi và Email nullable vì không phải NCC nào cũng cung cấp đầy đủ thông tin.
+ */
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('NCC', function (Blueprint $table) {

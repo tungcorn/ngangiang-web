@@ -31,6 +31,7 @@
         </div>
     </div>
     <div class="card-body">
+        {{-- Layout 2 cột: Cột trái hiển thị thông tin NCC, cột phải hiển thị bảng hàng hóa --}}
         <div class="row g-4">
             <div class="col-md-4 border-end">
                 <h6 class="text-uppercase text-muted small fw-bold mb-3">Nhà Cung Cấp</h6>
@@ -84,6 +85,7 @@
                             <tr>
                                 <td colspan="3" class="text-end py-2 fw-bold text-uppercase small text-muted">Tổng cộng</td>
                                 <td class="text-end pe-3 py-2 fw-bold text-primary fs-6">
+                                    {{-- Tính tổng tiền: sum(DonGia * Count) cho tất cả chi tiết --}}
                                     {{ number_format($don->chiTiet->sum(function($ct) { return $ct->matHang->DonGia * $ct->Count; })) }} ₫
                                 </td>
                             </tr>

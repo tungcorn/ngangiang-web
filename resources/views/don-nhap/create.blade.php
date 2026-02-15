@@ -32,7 +32,9 @@
                         </div>
 
                         <div class="bg-light rounded-3 p-3 mb-3">
+                            {{-- Container chứa các dòng mặt hàng, hỗ trợ thêm/xóa động bằng JS --}}
                             <div id="items-container">
+                                {{-- Nếu validation fail, hiển thị lại dữ liệu cũ từ old() --}}
                                 @if(old('items'))
                                     @foreach(old('items') as $index => $item)
                                     <div class="row g-3 mb-3 item-row">
@@ -40,6 +42,7 @@
                                             <label class="form-label small text-muted">Mặt hàng</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                {{-- Nhóm mặt hàng theo loại bằng optgroup để dễ tìm kiếm --}}
                                                 <select name="items[{{ $index }}][FK_Id_MatHang]" class="form-select mat-hang-select @error('items.'.$index.'.FK_Id_MatHang') is-invalid @enderror">
                                                     <option value="">-- Chọn mặt hàng --</option>
                                                     @foreach($dsLoaiHang as $loai)

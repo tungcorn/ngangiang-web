@@ -6,10 +6,17 @@ use App\Models\LoaiHang;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MatHang>
+ * Factory tạo dữ liệu mẫu cho Mặt Hàng.
  */
 class MatHangFactory extends Factory
 {
+    /**
+     * Định nghĩa dữ liệu mẫu cho Mặt Hàng.
+     *
+     * Dùng danh sách 12 sản phẩm thực tế (laptop, linh kiện, văn phòng phẩm...)
+     * thay vì text ngẫu nhiên để dữ liệu demo có ý nghĩa nghiệp vụ.
+     * LoaiHang::factory() tự động tạo loại hàng mới nếu chưa có.
+     */
     public function definition(): array
     {
         return [

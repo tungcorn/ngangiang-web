@@ -10,14 +10,32 @@ use App\Models\NCC;
 use App\Models\MatHang;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Controller quản lý Đơn nhập hàng.
+ *
+ * Xử lý các chức năng: hiển thị danh sách, tạo mới đơn nhập hàng.
+ * Mỗi đơn nhập hàng gồm 1 NCC và nhiều chi tiết mặt hàng.
+ */
 class DonNhapHangController extends Controller
 {
+    /**
+     * Hiển thị danh sách đơn nhập hàng.
+     *
+     * Eager load quan hệ `ncc` và `chiTiet.matHang` để tránh N+1 query.
+     * Sắp xếp đơn mới nhất lên đầu, phân trang 5 đơn/trang.
+     */
     public function index()
     {
         $dsDonNhap = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc')->paginate(5);
         return view('don-nhap.index', compact('dsDonNhap'));
     }
 
+    /**
+     * Hiển thị form tạo đơn nhập hàng mới.
+     *
+     * Truyền danh sách NCC cho dropdown chọn nhà cung cấp,
+     * và danh sách Loại hàng (kèm mặt hàng) để nhóm <optgroup> theo loại.
+     */
     public function create()
     {
         $dsNCC = NCC::all();
@@ -25,8 +43,20 @@ class DonNhapHangController extends Controller
         return view('don-nhap.create', compact('dsNCC', 'dsLoaiHang'));
     }
 
+    /**
+     * Lưu đơn nhập hàng mới vào CSDL.
+     *
+     * Quy trình xử lý:
+     * 1. Validate dữ liệu đầu vào (NCC tồn tại, ít nhất 1 mặt hàng, số lượng > 0)
+     * 2. Sử dụng Transaction để đảm bảo tính nhất quán dữ liệu
+     * 3. Gộp các mặt hàng trùng (cộng dồn số lượng) trước khi lưu chi tiết
+     *
+     * @param Request $request Dữ liệu từ form tạo đơn
+     * @return \Illuminate\Http\RedirectResponse Redirect về danh sách kèm thông báo
+     */
     public function store(Request $request)
     {
+        // Validate dữ liệu: đảm bảo NCC hợp lệ, có ít nhất 1 mặt hàng, số lượng >= 1
         $request->validate([
             'FK_Id_NCC' => 'required|exists:NCC,Id_NCC',
             'items' => 'required|array|min:1',
@@ -44,13 +74,17 @@ class DonNhapHangController extends Controller
         ]);
 
         try {
+            // Sử dụng Transaction: nếu insert chi tiết bị lỗi thì rollback toàn bộ đơn,
+            // tránh tình trạng đơn nhập tồn tại mà không có chi tiết mặt hàng.
             DB::beginTransaction();
 
             $donNhap = DonNhapHang::create([
                 'FK_Id_NCC' => $request->FK_Id_NCC,
             ]);
 
-            // Gộp các mặt hàng trùng nhau (cộng dồn số lượng)
+            // Gộp các mặt hàng trùng nhau (cộng dồn số lượng).
+            // Vì bảng ChiTietDonNhap dùng composite PK (FK_Id_DonNhapHang, FK_Id_MatHang),
+            // nên mỗi mặt hàng chỉ được xuất hiện 1 lần trong 1 đơn.
             $mergedItems = [];
             foreach ($request->items as $item) {
                 $matHangId = $item['FK_Id_MatHang'];
@@ -77,6 +111,7 @@ class DonNhapHangController extends Controller
         }
     }
 
+    // Các method CRUD còn lại chưa triển khai vì ngoài phạm vi yêu cầu bài test.
     public function show(DonNhapHang $donNhapHang) {}
     public function edit(DonNhapHang $donNhapHang) {}
     public function update(Request $request, DonNhapHang $donNhapHang) {}
