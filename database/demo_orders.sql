@@ -54,5 +54,5 @@ BEGIN
 END
 
 GO
-PRINT N'Đã tạo 15 đơn nhập hàng giả để test!';
+PRINT N'Đã tạo 60 đơn nhập hàng giả để test!';
 GO
