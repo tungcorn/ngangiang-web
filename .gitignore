@@ -46,5 +46,5 @@ _ide_helper.php.swo
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 DOCUMENTATION_WORD.md
-doc.docx
-~$doc.docx
+doc*.docx
+~$doc*.docx
