@@ -107,7 +107,7 @@
                         </td>
                         <td class="text-end fw-medium">{{ number_format($tongTien) }} ₫</td>
                         <td class="text-center">
-                            {{-- Nút hành động inline: Chi tiết (toggle detail), Sửa, Xóa --}}
+                            {{-- Nút hành động: Xem chi tiết (Modal), Sửa, Xóa --}}
                             <button class="btn btn-sm btn-primary btn-chi-tiet" title="Xem chi tiết">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -117,55 +117,6 @@
                             <button class="btn btn-sm btn-danger btn-xoa" title="Xóa" onclick="event.stopPropagation();">
                                 <i class="bi bi-trash"></i>
                             </button>
-                        </td>
-                    </tr>
-                    {{-- Dòng chi tiết ẩn — hiện khi click vào đơn hàng --}}
-                    <tr class="chi-tiet-row d-none" id="chiTiet_{{ $don->Id_DonNhapHang }}">
-                        {{-- Add border bottom to separate from next row clearly --}}
-                        <td colspan="6" class="p-0 border-0" style="border-bottom: 2px solid #dee2e6;">
-                            {{-- Container: Unified Grey Block (match active parent), Left accent, Inset Padding --}}
-                            <div style="background-color: #f8f9fa; border-left: 4px solid #6c757d; padding: 15px 15px 15px 60px;">
-                                
-                                {{-- Header nhỏ, kết nối với border trái --}}
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="bi bi-arrow-return-right text-secondary me-2 fs-4"></i>
-                                    <span class="text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px;">
-                                        Chi tiết đơn #{{ $don->Id_DonNhapHang }}
-                                    </span>
-                                </div>
-
-                                {{-- Bảng chi tiết: Nền trắng, Border nhẹ --}}
-                                <table class="table table-sm table-bordered mb-0 bg-white" style="box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                                    <thead class="bg-light text-secondary">
-                                        <tr>
-                                            <th class="fw-semibold ps-3">Mặt hàng</th>
-                                            <th class="fw-semibold text-center">Đơn vị</th>
-                                            <th class="fw-semibold text-end">Đơn giá</th>
-                                            <th class="fw-semibold text-center">SL</th>
-                                            <th class="fw-semibold text-end pe-3">Thành tiền</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($don->chiTiet as $ct)
-                                        <tr>
-                                            <td class="ps-3 fw-medium text-dark">{{ $ct->matHang->Ten_MatHang }}</td>
-                                            <td class="text-center text-muted small py-2">{{ $ct->matHang->DonViTinh }}</td>
-                                            <td class="text-end text-secondary py-2">{{ number_format($ct->matHang->DonGia) }}</td>
-                                            <td class="text-center py-2">
-                                                <span class="fw-bold text-dark">{{ $ct->Count }}</span>
-                                            </td>
-                                            <td class="text-end fw-bold text-dark pe-3 py-2">{{ number_format($ct->matHang->DonGia * $ct->Count) }} ₫</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot style="border-top: 2px solid #e9ecef;">
-                                        <tr>
-                                            <td colspan="4" class="text-end py-2 fw-bold text-secondary text-uppercase small">Tổng cộng:</td>
-                                            <td class="text-end py-2 pe-3 fw-bold text-danger fs-6">{{ number_format($tongTien) }} ₫</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -200,6 +151,81 @@
     {{ $dsDonNhap->appends(request()->query())->links() }}
 </div>
 
-{{-- Script xử lý: click dòng NCC để toggle checkbox, click dòng đơn để expand/collapse chi tiết --}}
+{{-- ==================== MODAL XEM CHI TIẾT ĐƠN ==================== --}}
+{{-- Modal Bootstrap duy nhất — nội dung được populate bởi JS khi click vào đơn.
+     Dữ liệu chi tiết đã eager-load sẵn, lưu trong các div ẩn bên dưới. --}}
+<div class="modal fade" id="modalChiTiet" tabindex="-1" aria-labelledby="modalChiTietLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white py-2">
+                <h6 class="modal-title fw-bold" id="modalChiTietLabel">
+                    <i class="bi bi-receipt me-2"></i> Chi tiết đơn nhập hàng
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-0" id="modalChiTietBody">
+                {{-- Nội dung sẽ được JS inject vào đây --}}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Dữ liệu chi tiết pre-rendered — ẩn, JS sẽ lấy innerHTML inject vào modal --}}
+@foreach($dsDonNhap as $don)
+@php
+    $tongTienModal = $don->chiTiet->sum(function($ct) {
+        return $ct->matHang->DonGia * $ct->Count;
+    });
+@endphp
+<div class="d-none" id="detailContent_{{ $don->Id_DonNhapHang }}">
+    {{-- Header: Thông tin đơn hàng --}}
+    <div class="px-4 py-3 border-bottom bg-light">
+        <div class="row">
+            <div class="col-sm-6">
+                <small class="text-muted text-uppercase">Mã đơn</small>
+                <div class="fw-bold text-primary fs-5">#{{ $don->Id_DonNhapHang }}</div>
+            </div>
+            <div class="col-sm-6">
+                <small class="text-muted text-uppercase">Nhà cung cấp</small>
+                <div class="fw-bold">{{ $don->ncc->Ten_NCC }}</div>
+            </div>
+        </div>
+    </div>
+    {{-- Body: Danh sách mặt hàng --}}
+    <div class="px-4 py-3">
+        <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Mặt hàng</th>
+                    <th class="text-center">Đơn vị</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($don->chiTiet as $index => $ct)
+                <tr>
+                    <td class="text-muted">{{ $index + 1 }}</td>
+                    <td class="fw-medium">{{ $ct->matHang->Ten_MatHang }}</td>
+                    <td class="text-center text-muted small">{{ $ct->matHang->DonViTinh }}</td>
+                    <td class="text-end text-muted">{{ number_format($ct->matHang->DonGia) }} ₫</td>
+                    <td class="text-center fw-bold">{{ $ct->Count }}</td>
+                    <td class="text-end fw-semibold">{{ number_format($ct->matHang->DonGia * $ct->Count) }} ₫</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    {{-- Footer: Tổng cộng --}}
+    <div class="px-4 py-3 border-top bg-light d-flex justify-content-end align-items-center">
+        <span class="text-muted text-uppercase small me-3">Tổng cộng:</span>
+        <span class="fw-bold text-danger fs-5">{{ number_format($tongTienModal) }} ₫</span>
+    </div>
+</div>
+@endforeach
+
+{{-- Script xử lý: click dòng NCC để toggle checkbox, click dòng đơn để mở modal chi tiết --}}
 <script src="{{ asset('js/don-nhap-index.js') }}"></script>
 @endsection
