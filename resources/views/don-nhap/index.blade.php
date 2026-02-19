@@ -21,19 +21,26 @@
 {{-- Bộ lọc theo NCC: tick checkbox để hiển thị đơn hàng của NCC tương ứng --}}
 <div class="card mb-4 border-0 shadow-sm">
     <div class="card-body py-3">
-        <div class="d-flex align-items-center flex-wrap gap-3">
-            <span class="fw-bold text-muted small text-uppercase me-2">
-                <i class="bi bi-funnel me-1"></i> Lọc theo NCC:
-            </span>
-            <button type="button" class="btn btn-sm btn-primary" id="btnAllNCC">Tất cả</button>
-            <span class="text-muted">|</span>
-            @foreach($dsNCC as $ncc)
-            <div class="form-check form-check-inline">
-                <input class="form-check-input ncc-checkbox" type="checkbox" id="ncc_{{ $ncc->Id_NCC }}" value="{{ $ncc->Id_NCC }}">
-                <label class="form-check-label small" for="ncc_{{ $ncc->Id_NCC }}">{{ $ncc->Ten_NCC }}</label>
+        <form action="{{ route('don-nhap.index') }}" method="GET" id="filterForm">
+            <div class="d-flex align-items-center flex-wrap gap-3">
+                <span class="fw-bold text-muted small text-uppercase me-2">
+                    <i class="bi bi-funnel me-1"></i> Lọc theo NCC:
+                </span>
+                <a href="{{ route('don-nhap.index') }}" class="btn btn-sm {{ empty($selectedNccIds) ? 'btn-primary' : 'btn-outline-primary' }}">
+                    Tất cả
+                </a>
+                <span class="text-muted">|</span>
+                @foreach($dsNCC as $ncc)
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input ncc-checkbox" type="checkbox" name="ncc_ids[]" 
+                        value="{{ $ncc->Id_NCC }}" id="ncc_{{ $ncc->Id_NCC }}"
+                        onchange="this.form.submit()"
+                        {{ in_array($ncc->Id_NCC, $selectedNccIds) ? 'checked' : '' }}>
+                    <label class="form-check-label small" for="ncc_{{ $ncc->Id_NCC }}">{{ $ncc->Ten_NCC }}</label>
+                </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
+        </form>
     </div>
 </div>
 
@@ -116,10 +123,10 @@
     </div>
     {{-- Nút hành động: Xem chi tiết / Sửa / Xóa (chỉ giao diện, chưa có chức năng) --}}
     <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-2">
-        <a href="#" class="btn btn-sm btn-outline-primary">
+        <a href="#" class="btn btn-sm btn-outline-primary" onclick="event.preventDefault();">
             <i class="bi bi-eye me-1"></i> Xem chi tiết
         </a>
-        <a href="#" class="btn btn-sm btn-outline-warning">
+        <a href="#" class="btn btn-sm btn-outline-warning" onclick="event.preventDefault();">
             <i class="bi bi-pencil-square me-1"></i> Sửa
         </a>
         <a href="#" class="btn btn-sm btn-outline-danger" onclick="event.preventDefault();">
@@ -140,10 +147,9 @@
 </div>
 @endforelse
 
+{{-- Phân trang: appends(request()->query()) giúp giữ lại các tham số lọc (ncc_ids) khi chuyển trang --}}
 <div class="mt-4 d-flex justify-content-center small">
-    {{ $dsDonNhap->links() }}
+    {{ $dsDonNhap->appends(request()->query())->links() }}
 </div>
 
-{{-- Script lọc đơn hàng theo NCC --}}
-<script src="{{ asset('js/don-nhap-index.js') }}"></script>
 @endsection

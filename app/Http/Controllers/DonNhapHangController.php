@@ -24,11 +24,20 @@ class DonNhapHangController extends Controller
      * Eager load quan hệ `ncc` và `chiTiet.matHang` để tránh N+1 query.
      * Sắp xếp đơn mới nhất lên đầu, phân trang 5 đơn/trang.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $dsDonNhap = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc')->paginate(5);
+        $selectedNccIds = $request->input('ncc_ids', []);
+        
+        $query = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc');
+
+        if (!empty($selectedNccIds)) {
+            $query->whereIn('FK_Id_NCC', $selectedNccIds);
+        }
+
+        $dsDonNhap = $query->paginate(5);
         $dsNCC = NCC::all();
-        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC'));
+
+        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC', 'selectedNccIds'));
     }
 
     /**
