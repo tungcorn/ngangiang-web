@@ -121,43 +121,47 @@
                     </tr>
                     {{-- Dòng chi tiết ẩn — hiện khi click vào đơn hàng --}}
                     <tr class="chi-tiet-row d-none" id="chiTiet_{{ $don->Id_DonNhapHang }}">
-                        <td colspan="6" class="p-0 border-0">
-                            <div class="bg-light p-3 mx-2 mb-2 rounded-3 border">
-                                <h6 class="fw-bold text-muted small text-uppercase mb-2">
-                                    <i class="bi bi-box-seam me-1"></i> Chi tiết đơn #{{ $don->Id_DonNhapHang }}
-                                </h6>
-                                <table class="table table-sm table-borderless bg-white rounded mb-0">
-                                    <thead class="text-secondary small">
+                        {{-- Add border bottom to separate from next row clearly --}}
+                        <td colspan="6" class="p-0 border-0" style="border-bottom: 2px solid #dee2e6;">
+                            {{-- Container: Unified Grey Block (match active parent), Left accent, Inset Padding --}}
+                            <div style="background-color: #f8f9fa; border-left: 4px solid #6c757d; padding: 15px 15px 15px 60px;">
+                                
+                                {{-- Header nhỏ, kết nối với border trái --}}
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-arrow-return-right text-secondary me-2 fs-4"></i>
+                                    <span class="text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                        Chi tiết đơn #{{ $don->Id_DonNhapHang }}
+                                    </span>
+                                </div>
+
+                                {{-- Bảng chi tiết: Nền trắng, Border nhẹ --}}
+                                <table class="table table-sm table-bordered mb-0 bg-white" style="box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                    <thead class="bg-light text-secondary">
                                         <tr>
-                                            <th class="ps-3">Mặt hàng</th>
-                                            <th class="text-end">Đơn giá</th>
-                                            <th class="text-center">Số lượng</th>
-                                            <th class="text-end pe-3">Thành tiền</th>
+                                            <th class="fw-semibold ps-3">Mặt hàng</th>
+                                            <th class="fw-semibold text-center">Đơn vị</th>
+                                            <th class="fw-semibold text-end">Đơn giá</th>
+                                            <th class="fw-semibold text-center">SL</th>
+                                            <th class="fw-semibold text-end pe-3">Thành tiền</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($don->chiTiet as $ct)
                                         <tr>
-                                            <td class="ps-3">
-                                                <i class="bi bi-box-seam text-muted me-1"></i>
-                                                {{ $ct->matHang->Ten_MatHang }}
+                                            <td class="ps-3 fw-medium text-dark">{{ $ct->matHang->Ten_MatHang }}</td>
+                                            <td class="text-center text-muted small py-2">{{ $ct->matHang->DonViTinh }}</td>
+                                            <td class="text-end text-secondary py-2">{{ number_format($ct->matHang->DonGia) }}</td>
+                                            <td class="text-center py-2">
+                                                <span class="fw-bold text-dark">{{ $ct->Count }}</span>
                                             </td>
-                                            <td class="text-end text-muted">{{ number_format($ct->matHang->DonGia) }} ₫</td>
-                                            <td class="text-center">
-                                                <span class="badge bg-light text-dark border">{{ $ct->Count }}</span>
-                                            </td>
-                                            <td class="text-end pe-3 fw-medium">
-                                                {{ number_format($ct->matHang->DonGia * $ct->Count) }} ₫
-                                            </td>
+                                            <td class="text-end fw-bold text-dark pe-3 py-2">{{ number_format($ct->matHang->DonGia * $ct->Count) }} ₫</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
-                                    <tfoot class="border-top">
+                                    <tfoot style="border-top: 2px solid #e9ecef;">
                                         <tr>
-                                            <td colspan="4" class="text-end pe-3 py-2">
-                                                <span class="fw-bold small text-muted me-2">TỔNG CỘNG:</span>
-                                                <span class="fw-bold text-danger">{{ number_format($tongTien) }} ₫</span>
-                                            </td>
+                                            <td colspan="4" class="text-end py-2 fw-bold text-secondary text-uppercase small">Tổng cộng:</td>
+                                            <td class="text-end py-2 pe-3 fw-bold text-danger fs-6">{{ number_format($tongTien) }} ₫</td>
                                         </tr>
                                     </tfoot>
                                 </table>
