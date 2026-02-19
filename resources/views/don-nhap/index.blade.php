@@ -60,172 +60,117 @@
     </div>
 </div>
 
-{{-- ==================== PHẦN 2: BẢNG ĐƠN NHẬP HÀNG ==================== --}}
-{{-- Danh sách đơn nhập dạng bảng với nút hành động inline (Chi tiết/Sửa/Xóa).
-     Click vào dòng hoặc nút "Chi tiết" → expand inline hiển thị chi tiết đơn ngay bên dưới.
-     Dữ liệu chi tiết đã eager-load sẵn, lưu trong data attribute dạng JSON. --}}
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 fw-bold">
-            <i class="bi bi-receipt me-2 text-primary"></i> Đơn nhập hàng
-        </h6>
-        <span class="badge bg-light text-primary border rounded-pill fs-6">
-            Tổng: {{ $dsDonNhap->total() }} đơn
-        </span>
-    </div>
-    <div class="card-body p-0">
-        @if($dsDonNhap->count() > 0)
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="tblDonNhap">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 80px">Mã đơn</th>
-                        <th>Nhà cung cấp</th>
-                        <th>Mặt hàng</th>
-                        <th class="text-center" style="width: 110px">Số mặt hàng</th>
-                        <th class="text-end" style="width: 140px">Tổng tiền</th>
-                        <th class="text-center" style="width: 200px">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($dsDonNhap as $don)
-                    {{-- Dòng đơn hàng chính --}}
-                    @php
-                        $tongTien = $don->chiTiet->sum(function($ct) {
-                            return $ct->matHang->DonGia * $ct->Count;
-                        });
-                    @endphp
-                    <tr class="don-nhap-row" style="cursor: pointer;"
-                        data-don-id="{{ $don->Id_DonNhapHang }}">
-                        <td class="fw-bold text-primary">#{{ $don->Id_DonNhapHang }}</td>
-                        <td>{{ $don->ncc->Ten_NCC }}</td>
-                        <td class="text-muted small" style="max-width: 250px;">
-                            {{ $don->chiTiet->pluck('matHang.Ten_MatHang')->join(', ') }}
-                        </td>
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark border">{{ $don->chiTiet->count() }}</span>
-                        </td>
-                        <td class="text-end fw-medium">{{ number_format($tongTien) }} ₫</td>
-                        <td class="text-center">
-                            {{-- Nút hành động: Xem chi tiết (Modal), Sửa, Xóa --}}
-                            <button class="btn btn-sm btn-primary btn-chi-tiet" title="Xem chi tiết">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning btn-sua" title="Sửa" onclick="event.stopPropagation();">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger btn-xoa" title="Xóa" onclick="event.stopPropagation();">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @else
-        {{-- Trạng thái rỗng: không có đơn hàng nào --}}
-        <div class="text-center py-5">
-            <div class="bg-light rounded-circle p-4 d-inline-block mb-3">
-                <i class="bi bi-inbox fs-1 text-muted"></i>
-            </div>
-            <h5 class="text-muted">Chưa có đơn nhập hàng nào</h5>
-            <p class="text-muted mb-4">Bắt đầu bằng cách tạo đơn nhập hàng mới.</p>
-            <a href="{{ route('don-nhap.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-2"></i> Tạo Đơn ngay
-            </a>
-        </div>
-        @endif
-    </div>
-    @if($dsDonNhap->count() > 0)
-    {{-- Tổng số đơn và tổng cộng tiền (tính trên toàn bộ đơn đang lọc, không chỉ trang hiện tại) --}}
-    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
-        <span class="text-muted small fst-italic">Tổng số đơn: {{ $dsDonNhap->total() }}</span>
-        <span class="fw-bold text-danger">Tổng cộng: {{ number_format($tongCong) }} ₫</span>
-    </div>
-    @endif
+{{-- ==================== PHẦN 2: DANH SÁCH ĐƠN NHẬP HÀNG (DẠNG CARD) ==================== --}}
+{{-- Mỗi đơn hàng hiển thị dạng card: header chứa mã đơn + NCC + tổng tiền,
+     body chứa bảng chi tiết mặt hàng, footer chứa nút hành động.
+     Dữ liệu chi tiết đã eager-load sẵn, render trực tiếp không cần click. --}}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="mb-0 fw-bold">
+        <i class="bi bi-receipt me-2 text-primary"></i> Đơn nhập hàng
+    </h6>
+    <span class="badge bg-light text-primary border rounded-pill fs-6">
+        Tổng: {{ $dsDonNhap->total() }} đơn
+    </span>
 </div>
+
+@forelse($dsDonNhap as $don)
+@php
+    $tongTien = $don->chiTiet->sum(function($ct) {
+        return $ct->matHang->DonGia * $ct->Count;
+    });
+@endphp
+<div class="card mb-3 border-0 shadow-sm" style="border-left: 4px solid #4361ee !important; transition: box-shadow 0.2s ease;"
+     onmouseenter="this.style.boxShadow='0 4px 15px rgba(67,97,238,0.15)'"
+     onmouseleave="this.style.boxShadow='0 .125rem .25rem rgba(0,0,0,.075)'">
+
+    {{-- Card Header: Badge mã đơn + NCC (trái) | Nút hành động (phải) --}}
+    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">#{{ $don->Id_DonNhapHang }}</span>
+            <div>
+                <div class="fw-bold text-dark">{{ $don->ncc->Ten_NCC }}</div>
+                <small class="text-muted">{{ $don->chiTiet->count() }} mặt hàng</small>
+            </div>
+        </div>
+        {{-- Nút hành động: Xem chi tiết, Sửa, Xóa — nằm bên phải header --}}
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-primary" title="Xem chi tiết">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-warning" title="Sửa">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" title="Xóa">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    {{-- Card Body: Bảng chi tiết mặt hàng — borderless, compact --}}
+    <div class="card-body pt-0 pb-2 px-4">
+        <table class="table table-borderless table-sm align-middle mb-0" style="font-size: 0.875rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e9ecef;">
+                    <th class="text-muted fw-semibold py-2" style="width: 45%">Mặt hàng</th>
+                    <th class="text-muted fw-semibold text-center py-2">Đơn vị</th>
+                    <th class="text-muted fw-semibold text-end py-2">Đơn giá</th>
+                    <th class="text-muted fw-semibold text-center py-2">SL</th>
+                    <th class="text-muted fw-semibold text-end py-2">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($don->chiTiet as $ct)
+                <tr style="border-bottom: 1px solid #f5f5f5;">
+                    <td class="py-2 fw-medium text-dark">{{ $ct->matHang->Ten_MatHang }}</td>
+                    <td class="py-2 text-center text-muted">{{ $ct->matHang->DonViTinh }}</td>
+                    <td class="py-2 text-end text-muted">{{ number_format($ct->matHang->DonGia) }} ₫</td>
+                    <td class="py-2 text-center">
+                        <span class="fw-bold">{{ $ct->Count }}</span>
+                    </td>
+                    <td class="py-2 text-end fw-semibold text-dark">
+                        {{ number_format($ct->matHang->DonGia * $ct->Count) }} ₫
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Card Footer: Chỉ hiển thị Tổng cộng --}}
+    <div class="card-footer bg-white border-top py-2 px-4 d-flex justify-content-end align-items-center">
+        <small class="text-muted text-uppercase me-2">Tổng cộng:</small>
+        <span class="fw-bold text-danger fs-6">{{ number_format($tongTien) }} ₫</span>
+    </div>
+</div>
+@empty
+{{-- Trạng thái rỗng: không có đơn hàng nào --}}
+<div class="text-center py-5">
+    <div class="bg-light rounded-circle p-4 d-inline-block mb-3">
+        <i class="bi bi-inbox fs-1 text-muted"></i>
+    </div>
+    <h5 class="text-muted">Chưa có đơn nhập hàng nào</h5>
+    <p class="text-muted mb-4">Bắt đầu bằng cách tạo đơn nhập hàng mới.</p>
+    <a href="{{ route('don-nhap.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i> Tạo Đơn ngay
+    </a>
+</div>
+@endforelse
+
+{{-- Tổng cộng toàn bộ --}}
+@if($dsDonNhap->count() > 0)
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body d-flex justify-content-between align-items-center py-2">
+        <span class="text-muted small fst-italic">Tổng số đơn: {{ $dsDonNhap->total() }}</span>
+        <span class="fw-bold text-danger fs-5">Tổng cộng: {{ number_format($tongCong) }} ₫</span>
+    </div>
+</div>
+@endif
 
 {{-- Phân trang: appends(request()->query()) giữ lại tham số lọc NCC khi chuyển trang --}}
 <div class="mt-4 d-flex justify-content-center small">
     {{ $dsDonNhap->appends(request()->query())->links() }}
 </div>
 
-{{-- ==================== MODAL XEM CHI TIẾT ĐƠN ==================== --}}
-{{-- Modal Bootstrap duy nhất — nội dung được populate bởi JS khi click vào đơn.
-     Dữ liệu chi tiết đã eager-load sẵn, lưu trong các div ẩn bên dưới. --}}
-<div class="modal fade" id="modalChiTiet" tabindex="-1" aria-labelledby="modalChiTietLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-primary text-white py-2">
-                <h6 class="modal-title fw-bold" id="modalChiTietLabel">
-                    <i class="bi bi-receipt me-2"></i> Chi tiết đơn nhập hàng
-                </h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
-            </div>
-            <div class="modal-body p-0" id="modalChiTietBody">
-                {{-- Nội dung sẽ được JS inject vào đây --}}
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Dữ liệu chi tiết pre-rendered — ẩn, JS sẽ lấy innerHTML inject vào modal --}}
-@foreach($dsDonNhap as $don)
-@php
-    $tongTienModal = $don->chiTiet->sum(function($ct) {
-        return $ct->matHang->DonGia * $ct->Count;
-    });
-@endphp
-<div class="d-none" id="detailContent_{{ $don->Id_DonNhapHang }}">
-    {{-- Header: Thông tin đơn hàng --}}
-    <div class="px-4 py-3 border-bottom bg-light">
-        <div class="row">
-            <div class="col-sm-6">
-                <small class="text-muted text-uppercase">Mã đơn</small>
-                <div class="fw-bold text-primary fs-5">#{{ $don->Id_DonNhapHang }}</div>
-            </div>
-            <div class="col-sm-6">
-                <small class="text-muted text-uppercase">Nhà cung cấp</small>
-                <div class="fw-bold">{{ $don->ncc->Ten_NCC }}</div>
-            </div>
-        </div>
-    </div>
-    {{-- Body: Danh sách mặt hàng --}}
-    <div class="px-4 py-3">
-        <table class="table table-sm table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>Mặt hàng</th>
-                    <th class="text-center">Đơn vị</th>
-                    <th class="text-end">Đơn giá</th>
-                    <th class="text-center">SL</th>
-                    <th class="text-end">Thành tiền</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($don->chiTiet as $index => $ct)
-                <tr>
-                    <td class="text-muted">{{ $index + 1 }}</td>
-                    <td class="fw-medium">{{ $ct->matHang->Ten_MatHang }}</td>
-                    <td class="text-center text-muted small">{{ $ct->matHang->DonViTinh }}</td>
-                    <td class="text-end text-muted">{{ number_format($ct->matHang->DonGia) }} ₫</td>
-                    <td class="text-center fw-bold">{{ $ct->Count }}</td>
-                    <td class="text-end fw-semibold">{{ number_format($ct->matHang->DonGia * $ct->Count) }} ₫</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    {{-- Footer: Tổng cộng --}}
-    <div class="px-4 py-3 border-top bg-light d-flex justify-content-end align-items-center">
-        <span class="text-muted text-uppercase small me-3">Tổng cộng:</span>
-        <span class="fw-bold text-danger fs-5">{{ number_format($tongTienModal) }} ₫</span>
-    </div>
-</div>
-@endforeach
-
-{{-- Script xử lý: click dòng NCC để toggle checkbox, click dòng đơn để mở modal chi tiết --}}
+{{-- Script xử lý: click dòng NCC để toggle checkbox --}}
 <script src="{{ asset('js/don-nhap-index.js') }}"></script>
 @endsection
