@@ -18,8 +18,27 @@
     </a>
 </div>
 
+{{-- Bộ lọc theo NCC: tick checkbox để hiển thị đơn hàng của NCC tương ứng --}}
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body py-3">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            <span class="fw-bold text-muted small text-uppercase me-2">
+                <i class="bi bi-funnel me-1"></i> Lọc theo NCC:
+            </span>
+            <button type="button" class="btn btn-sm btn-primary" id="btnAllNCC">Tất cả</button>
+            <span class="text-muted">|</span>
+            @foreach($dsNCC as $ncc)
+            <div class="form-check form-check-inline">
+                <input class="form-check-input ncc-checkbox" type="checkbox" id="ncc_{{ $ncc->Id_NCC }}" value="{{ $ncc->Id_NCC }}">
+                <label class="form-check-label small" for="ncc_{{ $ncc->Id_NCC }}">{{ $ncc->Ten_NCC }}</label>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
 @forelse($dsDonNhap as $don)
-<div class="card mb-4">
+<div class="card mb-4 don-nhap-card" data-ncc-id="{{ $don->FK_Id_NCC }}">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
             <div class="rounded-circle bg-light p-2 me-3 text-primary">
@@ -95,6 +114,18 @@
             </div>
         </div>
     </div>
+    {{-- Nút hành động: Xem chi tiết / Sửa / Xóa (chỉ giao diện, chưa có chức năng) --}}
+    <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-2">
+        <a href="#" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-eye me-1"></i> Xem chi tiết
+        </a>
+        <a href="#" class="btn btn-sm btn-outline-warning">
+            <i class="bi bi-pencil-square me-1"></i> Sửa
+        </a>
+        <a href="#" class="btn btn-sm btn-outline-danger" onclick="event.preventDefault();">
+            <i class="bi bi-trash me-1"></i> Xóa
+        </a>
+    </div>
 </div>
 @empty
 <div class="text-center py-5">
@@ -113,4 +144,6 @@
     {{ $dsDonNhap->links() }}
 </div>
 
+{{-- Script lọc đơn hàng theo NCC --}}
+<script src="{{ asset('js/don-nhap-index.js') }}"></script>
 @endsection

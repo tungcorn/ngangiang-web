@@ -27,7 +27,8 @@ class DonNhapHangController extends Controller
     public function index()
     {
         $dsDonNhap = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc')->paginate(5);
-        return view('don-nhap.index', compact('dsDonNhap'));
+        $dsNCC = NCC::all();
+        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC'));
     }
 
     /**
