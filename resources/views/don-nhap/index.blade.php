@@ -81,6 +81,7 @@
                     <tr>
                         <th style="width: 80px">Mã đơn</th>
                         <th>Nhà cung cấp</th>
+                        <th>Mặt hàng</th>
                         <th class="text-center" style="width: 110px">Số mặt hàng</th>
                         <th class="text-end" style="width: 140px">Tổng tiền</th>
                         <th class="text-center" style="width: 200px">Hành động</th>
@@ -109,6 +110,9 @@
                         data-tong-tien="{{ $tongTien }}">
                         <td class="fw-bold text-primary">#{{ $don->Id_DonNhapHang }}</td>
                         <td>{{ $don->ncc->Ten_NCC }}</td>
+                        <td class="text-muted small" style="max-width: 250px;">
+                            {{ $don->chiTiet->pluck('matHang.Ten_MatHang')->join(', ') }}
+                        </td>
                         <td class="text-center">
                             <span class="badge bg-light text-dark border">{{ $don->chiTiet->count() }}</span>
                         </td>
@@ -128,7 +132,7 @@
                     </tr>
                     {{-- Dòng chi tiết ẩn — hiện khi click vào đơn hàng --}}
                     <tr class="chi-tiet-row d-none" id="chiTiet_{{ $don->Id_DonNhapHang }}">
-                        <td colspan="5" class="p-0 border-0">
+                        <td colspan="6" class="p-0 border-0">
                             <div class="bg-light p-3 mx-2 mb-2 rounded-3 border">
                                 <h6 class="fw-bold text-muted small text-uppercase mb-2">
                                     <i class="bi bi-box-seam me-1"></i> Chi tiết đơn #{{ $don->Id_DonNhapHang }}
@@ -161,9 +165,9 @@
                                     </tbody>
                                     <tfoot class="border-top">
                                         <tr>
-                                            <td colspan="3" class="text-end py-2 fw-bold small text-muted">TỔNG CỘNG</td>
-                                            <td class="text-end pe-3 py-2 fw-bold text-danger">
-                                                {{ number_format($tongTien) }} ₫
+                                            <td colspan="4" class="text-end pe-3 py-2">
+                                                <span class="fw-bold small text-muted me-2">TỔNG CỘNG:</span>
+                                                <span class="fw-bold text-danger">{{ number_format($tongTien) }} ₫</span>
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -189,6 +193,13 @@
         </div>
         @endif
     </div>
+    @if($dsDonNhap->count() > 0)
+    {{-- Tổng số đơn và tổng cộng tiền (tính trên toàn bộ đơn đang lọc, không chỉ trang hiện tại) --}}
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
+        <span class="text-muted small fst-italic">Tổng số đơn: {{ $dsDonNhap->total() }}</span>
+        <span class="fw-bold text-danger">Tổng cộng: {{ number_format($tongCong) }} ₫</span>
+    </div>
+    @endif
 </div>
 
 {{-- Phân trang: appends(request()->query()) giữ lại tham số lọc NCC khi chuyển trang --}}

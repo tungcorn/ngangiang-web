@@ -37,7 +37,18 @@ class DonNhapHangController extends Controller
         $dsDonNhap = $query->paginate(5);
         $dsNCC = NCC::all();
 
-        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC', 'selectedNccIds'));
+        // Tính tổng tiền toàn bộ đơn hàng đang lọc (không chỉ trang hiện tại)
+        $queryTongCong = DB::table('DonNhapHang as d')
+            ->join('ChiTietDonNhap as c', 'd.Id_DonNhapHang', '=', 'c.FK_Id_DonNhapHang')
+            ->join('MatHang as m', 'c.FK_Id_MatHang', '=', 'm.Id_MatHang');
+
+        if (!empty($selectedNccIds)) {
+            $queryTongCong->whereIn('d.FK_Id_NCC', $selectedNccIds);
+        }
+
+        $tongCong = $queryTongCong->sum(DB::raw('c.Count * m.DonGia'));
+
+        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC', 'selectedNccIds', 'tongCong'));
     }
 
     /**
