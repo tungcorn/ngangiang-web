@@ -94,20 +94,9 @@
                         $tongTien = $don->chiTiet->sum(function($ct) {
                             return $ct->matHang->DonGia * $ct->Count;
                         });
-                        // Chuẩn bị dữ liệu chi tiết dạng JSON để JS render inline
-                        $chiTietJson = $don->chiTiet->map(function($ct) {
-                            return [
-                                'ten' => $ct->matHang->Ten_MatHang,
-                                'donGia' => $ct->matHang->DonGia,
-                                'soLuong' => $ct->Count,
-                                'thanhTien' => $ct->matHang->DonGia * $ct->Count,
-                            ];
-                        });
                     @endphp
                     <tr class="don-nhap-row" style="cursor: pointer;"
-                        data-don-id="{{ $don->Id_DonNhapHang }}"
-                        data-chi-tiet='@json($chiTietJson)'
-                        data-tong-tien="{{ $tongTien }}">
+                        data-don-id="{{ $don->Id_DonNhapHang }}">
                         <td class="fw-bold text-primary">#{{ $don->Id_DonNhapHang }}</td>
                         <td>{{ $don->ncc->Ten_NCC }}</td>
                         <td class="text-muted small" style="max-width: 250px;">

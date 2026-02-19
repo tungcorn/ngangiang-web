@@ -22,6 +22,7 @@ class DonNhapHangController extends Controller
      * Hiển thị danh sách đơn nhập hàng.
      *
      * Eager load quan hệ `ncc` và `chiTiet.matHang` để tránh N+1 query.
+     * Hỗ trợ lọc theo NCC (ncc_ids[]) và tính tổng tiền toàn bộ kết quả lọc.
      * Sắp xếp đơn mới nhất lên đầu, phân trang 5 đơn/trang.
      */
     public function index(Request $request)
