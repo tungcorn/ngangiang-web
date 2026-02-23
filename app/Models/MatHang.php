@@ -15,6 +15,9 @@ class MatHang extends Model
 {
     use HasFactory;
 
+    /** Danh sách đơn vị tính được cấu hình sẵn — dùng chung cho Controller + View */
+    public const DON_VI_TINH = ['Cái', 'Hộp', 'Bộ', 'Kg', 'Lít', 'Cuộn', 'Thùng', 'Chiếc'];
+
     protected $table = 'MatHang';
     protected $primaryKey = 'Id_MatHang';
     protected $fillable = ['Ten_MatHang', 'DonViTinh', 'DonGia', 'FK_Id_LoaiHang'];
