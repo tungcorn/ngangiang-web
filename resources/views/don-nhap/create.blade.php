@@ -18,9 +18,9 @@
                     @csrf
                     
                     <div class="row g-4 mb-4">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <label class="form-label fw-bold text-uppercase small text-muted mb-3">
-                            <i class="bi bi-building me-1"></i> Thông tin Nhà Cung Cấp
+                            <i class="bi bi-building me-1"></i> Nhà Cung Cấp
                         </label>
                         <select name="FK_Id_NCC" class="form-select form-select-lg @error('FK_Id_NCC') is-invalid @enderror">
                             <option value="">-- Chọn Nhà Cung Cấp --</option>
@@ -29,6 +29,16 @@
                             @endforeach
                         </select>
                         @error('FK_Id_NCC') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                        <label class="form-label fw-bold text-uppercase small text-muted mb-3">
+                            <i class="bi bi-calendar-date me-1"></i> Ngày nhập
+                        </label>
+                        <input type="date" name="NgayNhap"
+                               class="form-control form-control-lg @error('NgayNhap') is-invalid @enderror"
+                               value="{{ old('NgayNhap', date('Y-m-d')) }}">
+                        @error('NgayNhap') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="bg-light rounded-3 p-3 mb-3">

@@ -14,21 +14,21 @@
     </a>
 </div>
 
-{{-- ==================== PHẦN 1: BẢNG NCC (LISTCHECKBOX) ==================== --}}
-{{-- Hiển thị danh sách NCC dạng bảng có cột checkbox để lọc đơn hàng.
-     Tick vào NCC → form tự động submit lọc server-side.
-     Không tick NCC nào = hiển thị tất cả đơn hàng. --}}
+{{-- ==================== PHẦN 1: BỘ LỌC (NCC + KHOẢNG NGÀY) ==================== --}}
+{{-- Form lọc chung: gửi ncc_ids[], tu_ngay, den_ngay qua GET --}}
 <div class="card mb-4 border-0 shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h6 class="mb-0 fw-bold">
-            <i class="bi bi-building me-2 text-primary"></i> Nhà cung cấp (NCC)
+            <i class="bi bi-funnel me-2 text-primary"></i> Bộ lọc
         </h6>
-        <a href="{{ route('don-nhap.index') }}" class="btn btn-sm {{ empty($selectedNccIds) ? 'btn-primary' : 'btn-outline-primary' }}">
-            <i class="bi bi-arrow-counterclockwise me-1"></i> Tất cả
+        <a href="{{ route('don-nhap.index') }}" class="btn btn-sm {{ empty($selectedNccIds) && !$tuNgay && !$denNgay ? 'btn-primary' : 'btn-outline-primary' }}">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Xóa bộ lọc
         </a>
     </div>
     <div class="card-body p-0">
         <form action="{{ route('don-nhap.index') }}" method="GET" id="filterForm">
+
+            {{-- Bảng NCC checkbox --}}
             <div class="table-responsive">
                 <table class="table table-hover table-sm align-middle mb-0">
                     <thead class="table-light">
@@ -45,7 +45,6 @@
                             <td class="text-center">
                                 <input class="form-check-input ncc-checkbox" type="checkbox" name="ncc_ids[]"
                                     value="{{ $ncc->Id_NCC }}" id="ncc_{{ $ncc->Id_NCC }}"
-                                    onchange="this.form.submit()"
                                     {{ in_array($ncc->Id_NCC, $selectedNccIds) ? 'checked' : '' }}>
                             </td>
                             <td class="fw-medium">{{ $ncc->Ten_NCC }}</td>
@@ -55,6 +54,30 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="border-top px-4 py-3">
+                <div class="row g-3 align-items-end">
+                    <div class="col-auto">
+                        <label class="form-label small text-muted fw-semibold mb-1">
+                            <i class="bi bi-calendar-event me-1"></i> Từ ngày
+                        </label>
+                        <input type="date" name="tu_ngay" class="form-control form-control-sm"
+                               value="{{ $tuNgay }}" style="width: 170px;">
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label small text-muted fw-semibold mb-1">
+                            <i class="bi bi-calendar-event me-1"></i> Đến ngày
+                        </label>
+                        <input type="date" name="den_ngay" class="form-control form-control-sm"
+                               value="{{ $denNgay }}" style="width: 170px;">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary btn-sm px-3">
+                            <i class="bi bi-search me-1"></i> Lọc
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -81,6 +104,7 @@
                     <tr>
                         <th style="width: 80px">Mã đơn</th>
                         <th>Nhà cung cấp</th>
+                        <th style="width: 120px" class="text-center">Ngày nhập</th>
                         <th>Mặt hàng</th>
                         <th class="text-center" style="width: 110px">Số mặt hàng</th>
                         <th class="text-end" style="width: 140px">Tổng tiền</th>
@@ -97,6 +121,7 @@
                     <tr>
                         <td class="fw-bold text-primary">#{{ $don->Id_DonNhapHang }}</td>
                         <td>{{ $don->ncc->Ten_NCC }}</td>
+                        <td class="text-center">{{ $don->NgayNhap->format('d/m/Y') }}</td>
                         <td class="text-muted small" style="max-width: 250px;">
                             {{ $don->chiTiet->pluck('matHang.Ten_MatHang')->join(', ') }}
                         </td>
@@ -179,15 +204,19 @@
     {{-- Thông tin đơn --}}
     <div class="px-4 py-3 bg-light border-bottom">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <small class="text-muted text-uppercase fw-semibold">Mã đơn</small>
                 <div class="fw-bold text-primary fs-5">#{{ $don->Id_DonNhapHang }}</div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <small class="text-muted text-uppercase fw-semibold">Nhà cung cấp</small>
                 <div class="fw-bold">{{ $don->ncc->Ten_NCC }}</div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
+                <small class="text-muted text-uppercase fw-semibold">Ngày nhập</small>
+                <div class="fw-bold">{{ $don->NgayNhap->format('d/m/Y') }}</div>
+            </div>
+            <div class="col-sm-3">
                 <small class="text-muted text-uppercase fw-semibold">Số mặt hàng</small>
                 <div class="fw-bold">{{ $don->chiTiet->count() }}</div>
             </div>

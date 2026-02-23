@@ -9,16 +9,24 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // ====== Click dòng NCC → toggle checkbox ======
+    // Submit form chung filterForm (bao gồm cả ncc_ids[] và tu_ngay/den_ngay)
     document.querySelectorAll('.ncc-row').forEach(function (row) {
         row.addEventListener('click', function (e) {
-            // Nếu click trực tiếp vào checkbox thì không cần xử lý thêm
+            // Nếu click trực tiếp vào checkbox thì để onchange xử lý
             if (e.target.classList.contains('ncc-checkbox')) return;
 
             var checkbox = row.querySelector('.ncc-checkbox');
             if (checkbox) {
                 checkbox.checked = !checkbox.checked;
-                checkbox.form.submit();
+                document.getElementById('filterForm').submit();
             }
+        });
+    });
+
+    // ====== Checkbox NCC: khi thay đổi, submit form ======
+    document.querySelectorAll('.ncc-checkbox').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            document.getElementById('filterForm').submit();
         });
     });
 

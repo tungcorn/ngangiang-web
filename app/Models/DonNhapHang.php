@@ -17,8 +17,12 @@ class DonNhapHang extends Model
 
     protected $table = 'DonNhapHang';
     protected $primaryKey = 'Id_DonNhapHang';
-    protected $fillable = ['FK_Id_NCC'];
+    protected $fillable = ['FK_Id_NCC', 'NgayNhap'];
     public $timestamps = false;
+
+    protected $casts = [
+        'NgayNhap' => 'date',
+    ];
 
     /** Quan hệ N-1: Đơn nhập thuộc về một nhà cung cấp. */
     public function ncc()

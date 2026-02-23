@@ -22,17 +22,28 @@ class DonNhapHangController extends Controller
      * Hiển thị danh sách đơn nhập hàng.
      *
      * Eager load quan hệ `ncc` và `chiTiet.matHang` để tránh N+1 query.
-     * Hỗ trợ lọc theo NCC (ncc_ids[]) và tính tổng tiền toàn bộ kết quả lọc.
+     * Hỗ trợ lọc theo NCC (ncc_ids[]) và theo khoảng ngày nhập (tu_ngay, den_ngay).
+     * Tính tổng tiền toàn bộ kết quả lọc.
      * Sắp xếp đơn mới nhất lên đầu, phân trang 5 đơn/trang.
      */
     public function index(Request $request)
     {
         $selectedNccIds = $request->input('ncc_ids', []);
+        $tuNgay = $request->input('tu_ngay');
+        $denNgay = $request->input('den_ngay');
         
         $query = DonNhapHang::with(['ncc', 'chiTiet.matHang'])->orderBy('Id_DonNhapHang', 'desc');
 
         if (!empty($selectedNccIds)) {
             $query->whereIn('FK_Id_NCC', $selectedNccIds);
+        }
+
+        // Lọc theo khoảng ngày nhập
+        if ($tuNgay) {
+            $query->where('NgayNhap', '>=', $tuNgay);
+        }
+        if ($denNgay) {
+            $query->where('NgayNhap', '<=', $denNgay);
         }
 
         $dsDonNhap = $query->paginate(5);
@@ -46,10 +57,16 @@ class DonNhapHangController extends Controller
         if (!empty($selectedNccIds)) {
             $queryTongCong->whereIn('d.FK_Id_NCC', $selectedNccIds);
         }
+        if ($tuNgay) {
+            $queryTongCong->where('d.NgayNhap', '>=', $tuNgay);
+        }
+        if ($denNgay) {
+            $queryTongCong->where('d.NgayNhap', '<=', $denNgay);
+        }
 
         $tongCong = $queryTongCong->sum(DB::raw('c.Count * m.DonGia'));
 
-        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC', 'selectedNccIds', 'tongCong'));
+        return view('don-nhap.index', compact('dsDonNhap', 'dsNCC', 'selectedNccIds', 'tongCong', 'tuNgay', 'denNgay'));
     }
 
     /**
@@ -69,7 +86,7 @@ class DonNhapHangController extends Controller
      * Lưu đơn nhập hàng mới vào CSDL.
      *
      * Quy trình xử lý:
-     * 1. Validate dữ liệu đầu vào (NCC tồn tại, ít nhất 1 mặt hàng, số lượng > 0)
+     * 1. Validate dữ liệu đầu vào (NCC tồn tại, ngày nhập hợp lệ, ít nhất 1 mặt hàng, số lượng > 0)
      * 2. Sử dụng Transaction để đảm bảo tính nhất quán dữ liệu
      * 3. Gộp các mặt hàng trùng (cộng dồn số lượng) trước khi lưu chi tiết
      *
@@ -78,15 +95,18 @@ class DonNhapHangController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate dữ liệu: đảm bảo NCC hợp lệ, có ít nhất 1 mặt hàng, số lượng >= 1
+        // Validate dữ liệu: đảm bảo NCC hợp lệ, ngày nhập hợp lệ, có ít nhất 1 mặt hàng, số lượng >= 1
         $request->validate([
             'FK_Id_NCC' => 'required|exists:NCC,Id_NCC',
+            'NgayNhap' => 'required|date',
             'items' => 'required|array|min:1',
             'items.*.FK_Id_MatHang' => 'required|exists:MatHang,Id_MatHang',
             'items.*.Count' => 'required|integer|min:1',
         ], [
             'FK_Id_NCC.required' => 'Vui lòng chọn Nhà cung cấp.',
             'FK_Id_NCC.exists' => 'Nhà cung cấp không hợp lệ.',
+            'NgayNhap.required' => 'Vui lòng chọn ngày nhập.',
+            'NgayNhap.date' => 'Ngày nhập không hợp lệ.',
             'items.required' => 'Đơn hàng phải có ít nhất một mặt hàng.',
             'items.min' => 'Đơn hàng phải có ít nhất một mặt hàng.',
             'items.*.FK_Id_MatHang.required' => 'Vui lòng chọn mặt hàng.',
@@ -102,6 +122,7 @@ class DonNhapHangController extends Controller
 
             $donNhap = DonNhapHang::create([
                 'FK_Id_NCC' => $request->FK_Id_NCC,
+                'NgayNhap' => $request->NgayNhap,
             ]);
 
             // Gộp các mặt hàng trùng nhau (cộng dồn số lượng).
